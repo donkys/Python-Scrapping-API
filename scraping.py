@@ -13,9 +13,6 @@ def setScraping():
     soup = bs4.BeautifulSoup(data.text)
     return soup
 
-#Connect Database
-conn = sqlite3.connect('hora.db')
-
 # fp = []
 # dp0 = []
 # dp1 = []
@@ -83,6 +80,9 @@ def allPrize(prize):
     return list_allSortedPrizes
 
 def setData():
+    #Connect Database
+    conn = sqlite3.connect('hora.db')
+
     soup = setScraping()
     for c in soup.find_all('div', {'class': 'rowx div-link'}):
 
@@ -174,6 +174,9 @@ def sqlQueryAll(top, column):
     return sqlQuery
 
 def addDatabase():
+    #Connect Database
+    conn = sqlite3.connect('hora.db')
+
     t = time.time()
     if(t - readTime() > (3600.0 * 24)):
         print("update Time")
@@ -181,11 +184,17 @@ def addDatabase():
         conn.commit()
         setData()
 
+    #Close connection database.
+    conn.close()
+
 def getData():
+    #Connect Database
+    conn = sqlite3.connect('hora.db')
+
     addDatabase()
-    sql = sqlQuery2Session(1, 10, 2540, 10, "TWOUP")
+    # sql = sqlQuery2Session(1, 10, 2540, 10, "TWOUP")
     # sql = sqlQueryMonth(10, 2540, 10, "TWOUP")
-    # sql = sqlQueryAll(10, "TWOUP")
+    sql = sqlQueryAll(5, "TWOUP")
     
     cursor = conn.execute(sql)
     str = []
@@ -193,12 +202,14 @@ def getData():
     for row in cursor:
         str.append({"number" : row[0], "sum" : row[1]})
     
+    #Close connection database.
+    conn.close()
+    
     return str
 
 print(getData())
 
-#Close connection database.
-conn.close()
+
 
 
 
